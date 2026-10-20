@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#163c65">
+  <meta name="description" content="Le planning de la semaine courante de l’EHPAD Denis Affre, du lundi au dimanche.">
+  <title>Planning · EHPAD Denis Affre</title>
+  <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTciIGZpbGw9IiMxNzRiNTUiLz48cGF0aCBkPSJNMTggMTdoMjh2MzNIMTh6TTI0IDExdjEyTTQwIDExdjEyTTE4IDI4aDI4IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMyIvPjxwYXRoIGQ9Im0yNSAzOCA1IDUgMTAtMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2M1ZTJkNSIgc3Ryb2tlLXdpZHRoPSIzIi8+PC9zdmc+Cg==" type="image/svg+xml">
+  <style>:root {
+  --navy: #163c65; --ink: #172638; --line: #cdd3da;
+  --rail: 34px; --grid-height: 858px; --day-header: 58px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: var(--ink); background: #f4f5f7; font-synthesis: none;
+}
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, input, select { font: inherit; }
+button, summary { cursor: pointer; }
+button { color: inherit; }
+button:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible, .calendar-scroll:focus-visible { outline: 3px solid #6c98c7; outline-offset: 3px; }
+svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.masthead { max-width: 1576px; margin: 0 auto; padding: 26px 32px 22px; display: grid; grid-template-columns: 106px 1fr auto; align-items: center; gap: 24px; }
+.brand-logo { width: 94px; height: 77px; object-fit: contain; }
+.week-title { margin: 0; text-align: center; font-size: clamp(17px, 1.55vw, 23px); line-height: 1.5; font-weight: 600; color: #152f4d; }
+.header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+.heading-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 9px; width: 100%; }
+.button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; padding: 11px 14px; border: 1px solid transparent; border-radius: 5px; min-height: 42px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+.primary { color: #fff; background: var(--navy); }
+.primary:hover { background: #254f7d; }
+.secondary { background: #fff; border-color: #d2d8df; }
+.secondary:hover { background: #edf1f6; }
+.reset-button { color: #9a5a4d; border-color: #dfc9c2; margin-left: auto; }
+.reset-button:hover { background: #fff4ef; }
+.save-status { display: flex; align-items: center; gap: 6px; color: #7d8791; font-size: 10px; }
+.save-status i { width: 5px; height: 5px; border-radius: 50%; background: #7e9e88; }
+.save-status.error { color: #b14545; }
+.save-status.error i { background: #b14545; }
+.backup-menu { position: relative; }
+.backup-menu summary { list-style: none; width: 30px; height: 36px; display: grid; place-items: center; border-radius: 4px; }
+.backup-menu summary::-webkit-details-marker { display: none; }
+.backup-menu summary:hover { background: #e8edf3; }
+.dropdown { position: absolute; right: 0; top: 43px; padding: 6px; width: 235px; background: #fff; border: 1px solid #d2d8df; border-radius: 6px; box-shadow: 0 7px 25px #173a4020; z-index: 20; }
+.dropdown button { display: block; text-align: left; width: 100%; background: none; border: 0; padding: 12px 10px; font-size: 12px; border-radius: 4px; }
+.dropdown button:hover { background: #edf1f6; }
+main { max-width: 1576px; margin: 0 auto; padding: 0 32px 28px; }
+.planner { background: #fff; border: 1px solid var(--navy); }
+.calendar-scroll { overflow-x: auto; }
+.calendar { min-width: 760px; }
+.days-row { display: grid; grid-template-columns: var(--rail) repeat(7, minmax(0, 1fr)); height: var(--day-header); background: var(--navy); }
+.day-heading { display: flex; justify-content: center; align-items: center; gap: 7px; border-left: 1px solid #ffffff66; color: #fff; font-size: 15px; font-weight: 600; }
+.day-number { font-size: inherit; }
+.calendar-body { height: calc(var(--grid-height) * var(--layout-scale, 1)); position: relative; background: #fff; }
+.period { position: absolute; left: 0; width: var(--rail); display: flex; align-items: center; justify-content: center; background: var(--navy); color: #fff; }
+.period span { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 12px; font-weight: 600; letter-spacing: 2px; }
+.morning { top: 0; height: 50%; }
+.afternoon { top: 50%; bottom: 0; }
+.days-grid { position: absolute; left: var(--rail); top: 0; bottom: 0; right: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.day-column { position: relative; background: #fff; border-left: 1px solid var(--line); cursor: crosshair; }
+.day-column:first-child { border-left: 0; }
+.fixed-bands { position: absolute; left: var(--rail); right: 0; top: 0; bottom: 0; pointer-events: none; z-index: 2; }
+.fixed-band { position: absolute; left: 0; right: 0; height: calc(var(--grid-height) * 14 / 660); min-height: 16px; display: flex; align-items: center; justify-content: center; gap: 8px; overflow: hidden; font-size: 10px; font-weight: 600; letter-spacing: .3px; }
+.fixed-band time { font-size: inherit; font-weight: 500; }
+.pink { background: #f2d8e3; color: #61404f; }
+.blue { background: #d8eaf5; color: #34576b; }
+.green { background: #dcecc9; color: #4e6439; }
+.event { position: absolute; left: 5px; width: calc(100% - 10px); z-index: 3; text-align: center; border: 0; background: #fff; color: #000; border-radius: 0; padding: 4px; overflow: hidden; cursor: pointer; min-height: 0; }
+.event:hover { outline: 1px dashed #a6afb9; outline-offset: -1px; }
+.event:focus-visible { z-index: 5; }
+.event-time { display: block; font-size: 11px; font-weight: 600; line-height: 1.2; }
+.event-title { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; overflow-wrap: anywhere; font-size: 13px; font-weight: 700; line-height: 1.25; margin-top: 3px; }
+.event.short { padding: 0 3px; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.event.short .event-time { flex-shrink: 0; font-size: 9px; }
+.event.short .event-title { display: block; margin: 0; white-space: nowrap; text-overflow: ellipsis; font-size: 10px; }
+dialog { border: 1px solid #d2d8df; border-radius: 9px; padding: 0; color: var(--ink); width: min(490px, calc(100vw - 28px)); max-height: calc(100dvh - 32px); box-shadow: 0 25px 100px #173e4033; }
+dialog::backdrop { background: #132a4266; backdrop-filter: blur(2px); }
+#event-form { padding: 27px; }
+.dialog-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 25px; }
+h2 { font-size: 22px; letter-spacing: -.4px; font-weight: 600; line-height: 1.2; margin: 0; }
+.close-button { font-size: 25px; background: #f0f2f6; line-height: 26px; border: 0; border-radius: 50%; width: 29px; height: 29px; color: #768598; }
+.close-button:hover { background: #e0e6ef; }
+.field { display: flex; flex-direction: column; gap: 8px; margin: 0 0 21px; font-size: 12px; font-weight: 600; }
+.field input, .field select { width: 100%; min-width: 0; border: 1px solid #d2d8df; border-radius: 5px; padding: 11px 12px; background: #fff; font-size: 13px; min-height: 43px; color: #000; }
+.field input::placeholder { color: #9aa3ae; font-weight: 400; }
+.field input:focus, .field select:focus { border-color: #6687ad; }
+.field-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 15px; }
+#event-title { text-transform: uppercase; }
+.recurring-option { display: flex; align-items: center; gap: 10px; font-size: 12px; padding: 3px 0; cursor: pointer; }
+.recurring-option input { accent-color: var(--navy); width: 16px; height: 16px; margin: 0; }
+.form-error { color: #b44f41; font-size: 12px; line-height: 1.5; margin: 14px 0 0; }
+.form-error:empty { display: none; }
+.dialog-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e1e5eb; }
+.dialog-actions-right { display: flex; gap: 9px; justify-content: flex-end; margin-left: auto; }
+.delete-button { border: 0; background: none; color: #b45448; font-size: 12px; padding: 10px 0; }
+.delete-button:hover { text-decoration: underline; }
+.danger { background: #b45347; color: #fff; }
+.danger:hover { background: #963e35; }
+.confirm-content { padding: 27px; }
+.confirm-content p { font-size: 13px; line-height: 1.7; color: #738195; margin: 17px 0 25px; }
+.toast { position: fixed; bottom: 25px; left: 50%; transform: translate(-50%, 15px); background: var(--navy); color: #fff; padding: 13px 20px; border-radius: 6px; box-shadow: 0 4px 20px #173a4030; font-size: 12px; z-index: 100; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px); text-align: center; }
+.toast.visible { opacity: 1; transform: translate(-50%, 0); }
+[hidden] { display: none !important; }
+@media (max-width: 1100px) {
+  .masthead { grid-template-columns: 85px 1fr; gap: 15px; padding: 22px 24px; }
+  .brand-logo { width: 80px; height: 65px; }
+  .header-controls { grid-column: 1 / -1; }
+  .save-status { padding: 0; }
+  .week-title { text-align: left; font-size: 20px; }
+  main { padding: 0 24px 24px; }
+}
+@media (max-width: 650px) {
+  :root { --rail: 30px; }
+  .masthead { grid-template-columns: 64px 1fr; padding: 18px 14px; gap: 15px 12px; }
+  .brand-logo { width: 62px; height: 51px; }
+  .week-title { font-size: 16px; line-height: 1.5; }
+  .header-controls { flex-direction: column; align-items: flex-end; gap: 9px; }
+  .heading-actions { width: 100%; gap: 6px; }
+  .heading-actions .button { flex: 1; padding: 10px 8px; font-size: 10px; }
+  .heading-actions .reset-button { flex: 0 0 auto; }
+  .heading-actions svg { width: 15px; height: 15px; }
+  .save-status { padding-right: 0; font-size: 9px; }
+  main { padding: 0 14px 20px; }
+  .calendar { min-width: 1000px; }
+  .day-heading { font-size: 13px; }
+  .period span { font-size: 11px; }
+  .fixed-band { justify-content: flex-start; padding-left: 13px; }
+  #event-form { padding: 24px 20px; }
+  h2 { font-size: 20px; }
+  .field-row { gap: 10px; }
+  .dialog-actions { gap: 6px; }
+  .dialog-actions .button { padding: 10px; font-size: 11px; }
+  .delete-button { font-size: 11px; }
+}
+@page { size: A3 landscape; margin: 0; }
+@media print {
+  :root { --rail: 7mm; --grid-height: 262.5mm; --day-header: 11mm; background: #fff; font-family: Arial, sans-serif; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  html, body { background: #fff; width: 420mm; height: 297mm; margin: 0; padding: 0; }
+  .no-print, dialog, .toast { display: none !important; }
+  .masthead { height: 23mm; margin: 0; padding: 0; gap: 6mm; grid-template-columns: 28mm 1fr 28mm; max-width: none; width: 100%; }
+  .brand-logo { width: 28mm; height: 23mm; object-fit: contain; object-position: left top; }
+  .week-title { text-align: center; font-size: 16pt; line-height: 1.3; color: #000; font-weight: 600; }
+  main { padding: 0; margin: 0; max-width: none; width: 100%; }
+  .planner { break-inside: avoid; border-width: .25mm; }
+  .calendar-scroll { overflow: visible; }
+  .calendar { min-width: 0; width: 100%; }
+  .day-heading { font-size: 11pt; gap: 1.5mm; }
+  .period span { font-size: 9pt; letter-spacing: 2pt; }
+  .fixed-band { min-height: 0; font-size: 8pt; justify-content: center; padding: 0; gap: 2mm; }
+  .event { padding: .8mm 1mm; color: #000; background: #fff; }
+  .event-time { font-size: 8pt; }
+  .event-title { font-size: 10pt; line-height: 1.15; margin-top: .7mm; }
+  .event.short { padding: 0 .5mm; gap: 1mm; }
+  .event.short .event-time { font-size: 7pt; }
+  .event.short .event-title { font-size: 8pt; }
+  .calendar-body { height: var(--grid-height); break-inside: avoid; }
+}
+</style>
+  
+</head>
+<body>
+  <header class="masthead">
+    <img class="brand-logo" src="data:image/jpeg;base64,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" alt="Logo EHPAD Denis Affre" width="212" height="172">
+    <h1 class="week-title" id="week-title"></h1>
+    <div class="header-controls no-print">
+      <div class="heading-actions">
+        <button class="button secondary" id="print-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 8V3h10v5M7 17H4V9h16v8h-3M7 14h10v7H7zM17 11h.01"/></svg>Imprimer A3</button>
+        <button class="button primary" id="add-button"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Ajouter un événement</button>
+        <details class="backup-menu" id="backup-menu"><summary aria-label="Options de sauvegarde"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></summary><div class="dropdown"><button id="export-button">Exporter une sauvegarde</button><button id="import-button">Importer une sauvegarde</button></div></details>
+        <input type="file" id="import-file" accept="application/json,.json" hidden>
+        <button class="button secondary reset-button" id="reset-week-button">Réinitialiser la semaine</button>
+      </div>
+      <span class="save-status" id="save-status" role="status"><i></i>Enregistré sur cet appareil</span>
+    </div>
+  </header>
+  <main>
+    <section class="planner" aria-label="Planning de la semaine courante">
+      <div class="calendar-scroll" tabindex="0" role="region" aria-label="Tableau du lundi au dimanche, défilement horizontal possible">
+        <div class="calendar" id="calendar">
+          <div class="days-row" id="days-row"><div class="day-corner" aria-hidden="true"></div></div>
+          <div class="calendar-body" id="calendar-body">
+            <div class="period morning"><span>MATIN</span></div>
+            <div class="period afternoon"><span>APRÈS-MIDI</span></div>
+            <div class="days-grid" id="days-grid"></div>
+            <div class="fixed-bands" id="fixed-bands"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <dialog id="event-dialog" aria-labelledby="dialog-title">
+    <form id="event-form">
+      <div class="dialog-heading"><h2 id="dialog-title">Ajouter un événement</h2><button class="close-button" type="button" id="close-dialog" aria-label="Fermer">×</button></div>
+      <label class="field">Nom de l’événement<input id="event-title" name="title" required maxlength="90" placeholder="Ex. Atelier mémoire" autocomplete="off"></label>
+      <div class="field-row"><label class="field">Jour<select id="event-date" name="date" required></select></label><label class="field">Heure<input id="event-time" name="time" type="time" required min="08:00" max="18:45" step="60" value="10:30"></label></div>
+      <label class="recurring-option"><input type="checkbox" id="event-recurring" name="recurring"><span>Événement récurrent</span></label>
+      <p class="form-error" id="form-error" role="alert"></p>
+      <div class="dialog-actions"><button class="delete-button" type="button" id="delete-event" hidden>Supprimer</button><div class="dialog-actions-right"><button class="button secondary" type="button" id="cancel-dialog">Annuler</button><button class="button primary" type="submit" id="submit-event">Ajouter au planning</button></div></div>
+    </form>
+  </dialog>
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title"><div class="confirm-content"><h2 id="confirm-title">Supprimer cet événement ?</h2><p id="confirm-description"></p><div class="dialog-actions-right"><button class="button secondary" id="cancel-delete">Conserver</button><button class="button danger" id="confirm-delete">Supprimer</button></div></div></dialog>
+  <dialog id="import-dialog" aria-labelledby="import-title"><div class="confirm-content"><h2 id="import-title">Importer la sauvegarde ?</h2><p id="import-description"></p><div class="dialog-actions-right"><button class="button secondary" id="cancel-import">Annuler</button><button class="button primary" id="confirm-import">Remplacer et importer</button></div></div></dialog>
+  <dialog id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-description"><div class="confirm-content"><h2 id="reset-title">Réinitialiser la semaine</h2><p id="reset-description">Es-tu sûr(e) de vouloir réinitialiser la semaine ? Cela effacera les événements en cours non récurrents.</p><div class="dialog-actions-right"><button class="button secondary" id="cancel-reset" autofocus>Annuler</button><button class="button danger" id="confirm-reset">Réinitialiser</button></div></div></dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const START = 8 * 60;
+const END = 19 * 60;
+const DAYS = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+const FIXED = [
+  { time: '11:45', label: 'MISE EN TABLE', color: 'pink' },
+  { time: '12:00', label: 'REPAS', color: 'blue' },
+  { time: '16:00', label: 'GOÛTER', color: 'green' },
+  { time: '18:15', label: 'MISE EN TABLE', color: 'pink' },
+  { time: '18:30', label: 'REPAS', color: 'blue' },
+];
+function localDate(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
+function parseDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) throw new Error('Date invalide.');
+  const [y,m,d] = value.split('-').map(Number);
+  const result = new Date(y,m-1,d,12);
+  if (y < 1900 || y > 2199 || localDate(result) !== value) throw new Error('Date invalide.');
+  return result;
+}
+function addDays(date, count) { const d = new Date(date); d.setDate(d.getDate()+count); return d; }
+function mondayOf(date) { const d = new Date(date); d.setHours(12,0,0,0); return addDays(d,-((d.getDay()+6)%7)); }
+function minutes(time) { const [h,m] = time.split(':').map(Number); return h*60+m; }
+function timeAt(value) { return `${String(Math.floor(value/60)).padStart(2,'0')}:${String(value%60).padStart(2,'0')}`; }
+function formatTime(time) { return time.replace(':','h'); }
+function position(time) { return (minutes(time)-START)/(END-START)*100; }
+function weekLabel(monday) {
+  const sunday = addDays(monday,6);
+  const month = new Intl.DateTimeFormat('fr-FR',{month:'long'});
+  let first = String(monday.getDate());
+  if (monday.getFullYear() !== sunday.getFullYear()) first += ` ${month.format(monday)} ${monday.getFullYear()}`;
+  else if (monday.getMonth() !== sunday.getMonth()) first += ` ${month.format(monday)}`;
+  return `Semaine du lundi ${first} au dimanche ${sunday.getDate()} ${month.format(sunday)} ${sunday.getFullYear()}`;
+}
+function occurrenceOn(event, date) {
+  const value = localDate(date);
+  return event.recurring ? value >= event.date && parseDate(event.date).getDay() === date.getDay() : event.date === value;
+}
+function resetWeekEvents(events, date) {
+  const monday=mondayOf(date),start=localDate(monday),end=localDate(addDays(monday,7));
+  return events.filter(event=>event.recurring || event.date<start || event.date>=end);
+}
+function normalizeEvent(input) {
+  if (!input || typeof input !== 'object') throw new Error('Événement invalide.');
+  const title = String(input.title || '').trim().toLocaleUpperCase('fr-FR');
+  if (!title || title.length > 180) throw new Error('Indiquez un nom de 1 à 90 caractères.');
+  parseDate(input.date);
+  if (!/^\d{2}:\d{2}$/.test(input.time) || !/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(input.time)) throw new Error('Heure invalide.');
+  if (minutes(input.time) < START || minutes(input.time) > END-15) throw new Error('Choisissez une heure entre 08h00 et 18h45.');
+  if (typeof input.recurring !== 'boolean') throw new Error('Récurrence invalide.');
+  // Legacy backups remain readable; the removed presentation fields are ignored.
+  return { id: typeof input.id === 'string' && input.id.length <= 100 ? input.id : crypto.randomUUID(), title, date: input.date, time: input.time, recurring: input.recurring };
+}
+// Labels use the full day width. Additional space keeps stacked labels and
+// the shared fixed bands apart without changing the events' actual times.
+function layoutWeek(days) {
+  const slots = new Map();
+  function slot(time) {
+    if (!slots.has(time)) slots.set(time,{ events: days.map(()=>[]), fixed: null });
+    return slots.get(time);
+  }
+  days.forEach((events,day)=>events.forEach(event=>slot(minutes(event.time)).events[day].push(event)));
+  FIXED.forEach(fixed=>{ slot(minutes(fixed.time)).fixed=fixed; });
+  slot(13*60); slot(END);
+  const result = days.map(()=>[]), cursors = days.map(()=>START), bands = [];
+  const anchors = [{time:START,offset:0}];
+  let shift=0, morningEnd=13*60-START, length=END-START;
+  for (const [time,row] of [...slots].sort((a,b)=>a[0]-b[0])) {
+    const barrier=!!row.fixed || time===13*60 || time===END;
+    let start=barrier?Math.max(time+shift,...cursors):time+shift;
+    if(row.fixed?.time==='12:00') {
+      const setup=bands.find(band=>band.time==='11:45');
+      start=Math.max(start,...result.flat().map(event=>START+event.layoutStart+event.displayMinutes+2+setup.displayMinutes));
+      setup.layoutStart=start-START-setup.displayMinutes;
+      anchors.find(anchor=>anchor.time===11*60+45).offset=setup.layoutStart;
+    }
+    if (barrier) {
+      shift=start-time;
+      anchors.push({time,offset:start-START});
+    }
+    if (time===13*60) morningEnd=start-START;
+    if (row.fixed) {
+      bands.push({...row.fixed,layoutStart:start-START,displayMinutes:row.fixed.time==='11:45'?15:14});
+      cursors.fill(start+15);
+    }
+    row.events.forEach((events,day)=>events.forEach(event=>{
+      const eventStart=Math.max(time+shift,cursors[day]);
+      result[day].push({...event,layoutStart:eventStart-START,displayMinutes:43});
+      cursors[day]=eventStart+45;
+    }));
+    if (time===END) length=start-START;
+  }
+  // Keep the evening setup and meal together at the bottom of the board.
+  const eveningSetup=bands.find(band=>band.time==='18:15');
+  const dinner=bands.find(band=>band.time==='18:30');
+  eveningSetup.layoutStart=Math.max(
+    length-eveningSetup.displayMinutes-dinner.displayMinutes,
+    ...result.flat().map(event=>event.layoutStart+event.displayMinutes+2),
+    ...bands.filter(band=>band!==eveningSetup && band!==dinner).map(band=>band.layoutStart+band.displayMinutes+1),
+  );
+  dinner.layoutStart=eveningSetup.layoutStart+eveningSetup.displayMinutes;
+  length=dinner.layoutStart+dinner.displayMinutes;
+  anchors.find(anchor=>anchor.time===END).offset=length;
+  // Each period gets half the board. Expand the shorter period so stacked
+  // labels retain their space, including when one period has more events.
+  const half=Math.max(morningEnd,length-morningEnd);
+  const morningScale=half/morningEnd,afternoonScale=half/(length-morningEnd);
+  const balancedOffset=offset=>offset<=morningEnd
+    ? offset*morningScale
+    : half+(offset-morningEnd)*afternoonScale;
+  function balanceItem(item) {
+    const start=balancedOffset(item.layoutStart);
+    return {...item,layoutStart:start,displayMinutes:balancedOffset(item.layoutStart+item.displayMinutes)-start};
+  }
+  return {
+    days:result.map(events=>events.map(balanceItem)),
+    fixed:bands.map(balanceItem),
+    length:half*2,
+    morningEnd:half,
+    anchors:anchors.map(anchor=>({...anchor,offset:balancedOffset(anchor.offset)})),
+  };
+}
+function clockAtOffset(layout,offset) {
+  const anchors=layout.anchors;
+  if(offset<=0)return START;
+  for(let i=1;i<anchors.length;i++) {
+    if(offset<=anchors[i].offset) {
+      const previous=anchors[i-1],next=anchors[i];
+      return previous.time+(next.time-previous.time)*(offset-previous.offset)/(next.offset-previous.offset);
+    }
+  }
+  return END;
+}
+
+
+const $ = id => document.getElementById(id);
+const KEY = 'denis-affre-planning-v1';
+let events = [], week = mondayOf(new Date()), editing = null, occurrenceDate = null, pendingImport = null, toastTimer;
+let todayKey = localDate(new Date());
+let weekToReset=null;
+const dialog = $('event-dialog');
+function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>$('toast').classList.remove('visible'),4000); }
+function storageError(message) { $('save-status').classList.add('error'); $('save-status').replaceChildren(document.createElement('i'),document.createTextNode(message)); }
+try {
+  const saved = localStorage.getItem(KEY);
+  if (saved) { const data=JSON.parse(saved); if(data.version!==1 || !Array.isArray(data.events)) throw new Error(); events=data.events.map(normalizeEvent); }
+} catch { storageError('Sauvegarde à vérifier'); toast('La sauvegarde est illisible ou inaccessible. Exportez vos données avant de poursuivre.'); }
+function persist(next) {
+  try { localStorage.setItem(KEY,JSON.stringify({version:1,events:next})); events=next; $('save-status').classList.remove('error'); $('save-status').replaceChildren(document.createElement('i'),document.createTextNode('Enregistré sur cet appareil')); return true; }
+  catch { storageError('Enregistrement impossible'); toast('Enregistrement impossible dans ce navigateur. Libérez de l’espace ou autorisez le stockage local.'); return false; }
+}
+function el(tag, className, text) { const n=document.createElement(tag); if(className)n.className=className; if(text!==undefined)n.textContent=text; return n; }
+function render() {
+  week=mondayOf(new Date());
+  $('week-title').textContent=weekLabel(week);
+  const corner=el('div','day-corner');corner.setAttribute('aria-hidden','true');
+  $('days-row').replaceChildren(corner); $('days-grid').replaceChildren(); $('fixed-bands').replaceChildren();
+  const dayEvents=DAYS.map((_,i)=>events.filter(event=>occurrenceOn(event,addDays(week,i))));
+  const layout=layoutWeek(dayEvents);
+  $('calendar-body').style.setProperty('--layout-scale',layout.length/(END-START));
+  const afternoonStart=`${layout.morningEnd/layout.length*100}%`;
+  document.querySelector('.morning').style.height=afternoonStart;
+  document.querySelector('.afternoon').style.top=afternoonStart;
+  for(let i=0;i<7;i++) {
+    const date=addDays(week,i), key=localDate(date);
+    const heading=el('div','day-heading'); heading.append(el('span','day-name',DAYS[i]),el('span','day-number',date.getDate()));if(key===localDate(new Date()))heading.setAttribute('aria-current','date');$('days-row').append(heading);
+    const column=el('div','day-column');column.dataset.date=key; column.setAttribute('aria-label',`${DAYS[i]} ${date.getDate()}`);
+    for(const event of layout.days[i]) {
+      const button=el('button','event');button.type='button';button.dataset.eventId=event.id;button.style.top=`${event.layoutStart/layout.length*100}%`;button.style.height=`${event.displayMinutes/layout.length*100}%`;
+      button.append(el('span','event-time',formatTime(event.time)),el('span','event-title',event.title));
+      const description=`${event.title}, ${DAYS[i]} ${date.getDate()}, ${formatTime(event.time)}${event.recurring?', récurrent':''}. Modifier l’événement.`;
+      button.title=description;button.setAttribute('aria-label',description);button.addEventListener('click',e=>{e.stopPropagation();openEvent(event,key);});column.append(button);
+    }
+    column.addEventListener('click',e=>{const bounds=column.getBoundingClientRect();const clock=clockAtOffset(layout,(e.clientY-bounds.top)/bounds.height*layout.length);const m=Math.min(END-15,Math.max(START,Math.round(clock/15)*15));openEvent(null,key,timeAt(m));});
+    $('days-grid').append(column);
+  }
+  for(const fixed of layout.fixed){const band=el('div',`fixed-band ${fixed.color}`);band.dataset.time=fixed.time;band.style.top=`${fixed.layoutStart/layout.length*100}%`;band.style.height=`${fixed.displayMinutes/layout.length*100}%`;band.title='Rendez-vous quotidien fixe, non modifiable';band.append(el('span','',fixed.label),el('time','',formatTime(fixed.time)));$('fixed-bands').append(band);}
+}
+function openEvent(event=null,date=null,time='10:30') {
+  editing=event?.id||null; occurrenceDate=event?date:null;
+  $('event-form').reset();$('form-error').textContent='';
+  const selected=date||localDate(new Date());
+  $('event-date').replaceChildren(...DAYS.map((day,i)=>{const d=addDays(week,i),option=el('option','',`${day} ${d.getDate()}`);option.value=localDate(d);return option;}));
+  $('event-title').value=event?.title||'';$('event-date').value=selected;$('event-time').value=event?.time||time;
+  $('event-recurring').checked=event?.recurring||false;
+  $('dialog-title').textContent=event?'Modifier l’événement':'Ajouter un événement';$('submit-event').textContent=event?'Enregistrer':'Ajouter au planning';$('delete-event').hidden=!event;
+  dialog.showModal();
+}
+function closeEvent(){dialog.close();editing=null;occurrenceDate=null;}
+$('event-form').addEventListener('submit',e=>{
+  e.preventDefault();$('form-error').textContent='';
+  try {
+    const previous=events.find(e=>e.id===editing), selectedDate=$('event-date').value, recurring=$('event-recurring').checked;
+    const currentWeek=mondayOf(new Date());
+    if(selectedDate<localDate(currentWeek)||selectedDate>localDate(addDays(currentWeek,6)))throw new Error('Choisissez un jour de la semaine courante.');
+    // Editing an unchanged recurring occurrence preserves its original starting date.
+    let date=selectedDate;
+    if(previous?.recurring&&recurring){const shift=Math.round((Date.UTC(...selectedDate.split('-').map((n,i)=>Number(n)-(i===1?1:0)))-Date.UTC(...occurrenceDate.split('-').map((n,i)=>Number(n)-(i===1?1:0))))/86400000);date=localDate(addDays(parseDate(previous.date),shift));}
+    const event=normalizeEvent({id:editing||crypto.randomUUID(),title:$('event-title').value,date,time:$('event-time').value,recurring});
+    const next=editing?events.map(e=>e.id===editing?event:e):[...events,event];
+    if(!persist(next))return; const edited=!!editing;closeEvent();render();toast(edited?'Événement modifié.':'Événement ajouté au planning.');
+  }catch(error){$('form-error').textContent=error.message;}
+});
+$('add-button').addEventListener('click',()=>openEvent());$('close-dialog').addEventListener('click',closeEvent);$('cancel-dialog').addEventListener('click',closeEvent);
+dialog.addEventListener('cancel',()=>{editing=null;occurrenceDate=null;});
+$('print-button').addEventListener('click',()=>window.print());
+$('reset-week-button').addEventListener('click',()=>{weekToReset=new Date(week);$('reset-dialog').showModal();});
+function closeReset(){ $('reset-dialog').close();weekToReset=null; }
+$('cancel-reset').addEventListener('click',closeReset);
+$('reset-dialog').addEventListener('cancel',()=>{weekToReset=null;});
+$('confirm-reset').addEventListener('click',()=>{
+  if(!weekToReset || !persist(resetWeekEvents(events,weekToReset)))return;
+  closeReset();render();toast('Semaine réinitialisée. Les événements récurrents sont conservés.');
+});
+$('delete-event').addEventListener('click',()=>{const event=events.find(e=>e.id===editing);$('confirm-description').textContent=event.recurring?`« ${event.title} » sera supprimé de toutes les semaines. Les rendez-vous quotidiens fixes sont conservés.`:`« ${event.title} » sera supprimé du planning.`;$('confirm-dialog').showModal();});
+$('cancel-delete').addEventListener('click',()=>$('confirm-dialog').close());$('confirm-delete').addEventListener('click',()=>{if(!persist(events.filter(e=>e.id!==editing)))return;$('confirm-dialog').close();closeEvent();render();toast('Événement supprimé.');});
+$('export-button').addEventListener('click',()=>{const blob=new Blob([JSON.stringify({version:1,exportedAt:new Date().toISOString(),events},null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=el('a');a.href=url;a.download=`planning-denis-affre-${localDate(new Date())}.json`;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);$('backup-menu').open=false;toast('Sauvegarde exportée.');});
+$('import-button').addEventListener('click',()=>{$('import-file').click();$('backup-menu').open=false;});
+$('import-file').addEventListener('change',async e=>{
+  const file=e.target.files[0];e.target.value='';if(!file)return;
+  try{if(file.size>5000000)throw new Error('La sauvegarde est trop volumineuse (5 Mo maximum).');const data=JSON.parse(await file.text());if(data.version!==1||!Array.isArray(data.events)||data.events.length>10000)throw new Error('Format de sauvegarde invalide.');const imported=data.events.map(normalizeEvent);if(new Set(imported.map(e=>e.id)).size!==imported.length)throw new Error('La sauvegarde contient des identifiants en double.');pendingImport=imported;$('import-description').textContent=`Cette sauvegarde contient ${imported.length} événement${imported.length>1?'s':''}. Elle remplacera vos ${events.length} événement${events.length>1?'s':''} actuels. Les horaires fixes seront conservés.`;$('import-dialog').showModal();}
+  catch(error){toast(error instanceof SyntaxError?'Ce fichier JSON est illisible.':error.message);}
+});
+$('cancel-import').addEventListener('click',()=>{pendingImport=null;$('import-dialog').close();});$('confirm-import').addEventListener('click',()=>{if(pendingImport&&persist(pendingImport)){pendingImport=null;$('import-dialog').close();render();toast('Sauvegarde importée.');}});
+window.addEventListener('storage',e=>{if(e.key===KEY){try{const data=e.newValue?JSON.parse(e.newValue):{version:1,events:[]};if(data.version!==1||!Array.isArray(data.events))throw new Error();events=data.events.map(normalizeEvent);render();toast('Planning mis à jour depuis un autre onglet.');}catch{storageError('Sauvegarde à vérifier');}}});
+setInterval(()=>{const current=localDate(new Date());if(current!==todayKey){todayKey=current;render();}},30000);
+render();
+
+</script></body>
+</html>
